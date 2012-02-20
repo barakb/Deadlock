@@ -28,7 +28,7 @@ public class DeadlockDetector {
         this(1, TimeUnit.MINUTES, listeners);
     }
 
-    public DeadlockDetector(long period, TimeUnit timeUnit, DeadlockListener... listeners) {
+    public DeadlockDetector(long period, TimeUnit timeUnit, DeadlockListener ... listeners) {
         this(Executors.newSingleThreadScheduledExecutor(), period, timeUnit, listeners);
     }
 
@@ -48,10 +48,10 @@ public class DeadlockDetector {
         return listeners.remove(listener);
     }
 
-    private synchronized void notifyDeadlock(List<ThreadInfo> deadLockTreads) {
+    private synchronized void notifyDeadlock(List<ThreadInfo> deadlockThreads) {
         for (DeadlockListener listener : listeners) {
             try {
-                listener.onDeadlock(deadLockTreads);
+                listener.onDeadlock(deadlockThreads);
             } catch (Throwable e) {
                 logger.error(e, e);
             }
@@ -78,13 +78,13 @@ public class DeadlockDetector {
         public void run() {
             long[] ids = threadsMXbean.findMonitorDeadlockedThreads();
             if (ids != null && 0 < ids.length && someWasNotNotified(ids)) {
-                List<ThreadInfo> deadLockTreads = new ArrayList<ThreadInfo>(ids.length);
+                List<ThreadInfo> deadlockThreads = new ArrayList<ThreadInfo>(ids.length);
                 for (Long id : ids) {
                     alreadyNotified.add(id);
                     ThreadInfo ti = threadsMXbean.getThreadInfo(id, 30);
-                    deadLockTreads.add(ti);
+                    deadlockThreads.add(ti);
                 }
-                notifyDeadlock(deadLockTreads);
+                notifyDeadlock(deadlockThreads);
             }
         }
     }

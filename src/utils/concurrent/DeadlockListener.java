@@ -9,5 +9,5 @@ import java.util.List;
  * Time: 8:42:30 AM
  */
 public interface DeadlockListener {
-    void onDeadlock(List<ThreadInfo> deadLockTreads);
+    void onDeadlock(List<ThreadInfo> deadLockThreads);
 }

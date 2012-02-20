@@ -1,0 +1,60 @@
+<project name="Deadlock" default="dist" basedir=".">
+    <description>
+        Build the Deadlock project
+    </description>
+    <property name="src.dir" location="src"/>
+    <property name="tests.dir" location="tests"/>
+    <property name="examples.dir" location="examples"/>
+    <property name="build.dir" location="build"/>
+    <property name="dist.dir" location="dist"/>
+
+    <target name="init">
+        <mkdir dir="${build.dir}"/>
+        <mkdir dir="${dist.dir}"/>
+    </target>
+
+    <target name="compile" depends="init" description="compile the source ">
+        <javac debug="true" deprecation="on" destdir="${build.dir}" optimize="yes" verbose="false">
+            <src location="${src.dir}"/>
+            <src location="${tests.dir}"/>
+            <src location="${examples.dir}"/>
+            <classpath>
+                <fileset dir="${basedir}/lib" includes="*.jar"/>
+            </classpath>
+        </javac>
+    </target>
+
+    <target name="tests" depends="compile">
+        <junit printsummary="yes" haltonfailure="yes">
+            <classpath>
+                <pathelement path="${build.dir}"/>
+                <fileset dir="${basedir}/lib" includes="*.jar"/>
+            </classpath>
+            <formatter type="brief" usefile="false"/>
+            <batchtest fork="yes">
+                <fileset dir="${tests.dir}">
+                    <include name="**/*Test.java"/>
+                </fileset>
+            </batchtest>
+        </junit>
+    </target>
+
+    <target name="dist" depends="tests"
+            description="generate the distribution">
+        <jar jarfile="${dist.dir}/deadlock.jar" basedir="${build.dir}"/>
+        <delete file="${dist.dir}/deadlock.zip" />
+        <zip destfile="${dist.dir}/deadlock.zip">
+            <zipfileset dir="lib" prefix="deadlock/lib"/>
+            <zipfileset dir="src" prefix="deadlock/src"/>
+            <zipfileset dir="tests" prefix="deadlock/tests"/>
+            <zipfileset dir="examples" prefix="deadlock/examples"/>
+            <zipfileset dir="." includes="build.xml" fullpath="deadlock/build.xml"/>
+        </zip>
+    </target>
+
+    <target name="clean"
+            description="clean up">
+        <delete dir="${build.dir}"/>
+        <delete dir="${dist.dir}"/>
+    </target>
+</project>
